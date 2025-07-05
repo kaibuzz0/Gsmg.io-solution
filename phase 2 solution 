@@ -1,0 +1,76 @@
+
+
+import itertools
+import base64
+from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+from Crypto.Protocol.KDF import PBKDF1
+
+# === EMBEDDED ENCRYPTED PHASE 2 BLOB (Base64-encoded) ===
+BLOB_B64 = """
+U2FsdGVkX18GKGYS1D7X7VjxWz6uUyPFszr8dVvtOIrJqioWHgT69JJnzJGDVOvF
+QYWh5BEZxFPXmMq1cbyy3dVVDgLhF050xlDy2J5grtKw9jUOO4oFNRgoD+1dlukX
+pd8ccg++kkXgE9mGBP6lQbukDiSjY4mnR2Mv6ydIncrRqacQNVEmEgM4fGTi1ANz
+nHsGn7mP+P3UyrJCRbuFmpZJc4CNdPj6YuxwR4HkHkqcfxh0L5CaEu4VbY70+fmk
+qgZQyMJqiUlaV9KC4UPuRVj0r7MYbVRazkhsjeIcogmdJGEeBwD47lEB7X9PNKWm
+ojTvRZg6R+sZzRZE26VLaF+s9cpTo4Y8PZUxKvQ86HXC8QIavUgDfw7HxIxkTatv
+CW2yq3ZOXl5naR6oSNxdX9alyhTzB+/2623oGdlWev5Oo8xHJqUi7QjVP+mNC8BA
++Cg0DJwcOFGO5K7g8Rm06+sLogwntdIgTo70X3FegAtipHboeUNKefiAguvkDoIf
+8iMPc+83PygvlZPDNQCOKugwDEUimhHwQrMsmalRNoFEQEb+ZIC+na15cPoRAlOD
+NJfXIJ96ihAy9wWis39mQW6JFqZmUags4xoP3lJ35bCrXsNOPFZ4WH+f4YC/Ov8C
+QW5bjtxno8GG4b/wBWevhcRVMK6KmRJj8NBCssnrlz0sQ70rMNkiN2wiSPcwX3Ad
+JgLs8vQAUM59x9fkKFFzD4+Sc1sJztUTB7CMGGfpZOA8W33VZnEdmGcoaHlDsR8G
+vAkZ+jg+QJs9ZNHqWE1+1zgm/6NsWWgWH8OI2PPCfXHxDbfDk8uD/Zibr/yjSKvu
+Sb8OecflOT2hw37WL49uADgeWgnp2bzkfGIq7EYS7OImjZZwY5h4sfcPfhvQ9kOV
+"""
+
+# === KNOWN SEGMENTS (unordered) ===
+segments = [
+    "thekeymaker",
+    "thevenin",
+    "barrow",
+    "matrix",
+    "overlord",
+    "cxb7",
+    "chancellor"
+]
+
+# === PREPARE ENCRYPTED DATA ===
+encrypted_data = base64.b64decode("".join(BLOB_B64.strip().splitlines()))
+
+assert encrypted_data[:8] == b'Salted__', "Missing salt header"
+salt = encrypted_data[8:16]
+ciphertext = encrypted_data[16:]
+
+# === BRUTE FORCE ===
+for i, perm in enumerate(itertools.permutations(segments)):
+    password = ''.join(perm)
+    key_iv = PBKDF1(password.encode(), salt, 32 + 16, 1000, SHA256)
+    key = key_iv[:32]
+    iv = key_iv[32:]
+
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    try:
+        decrypted = cipher.decrypt(ciphertext)
+        if b"::==DATA_BLOCK_START==::" in decrypted:
+            print(f"\n✅ Match found! Permutation #{i+1}: {password}\n")
+            print(decrypted.decode(errors="replace"))
+            break
+    except Exception:
+        continue
+
+
+---
+
+✅ Notes:
+
+Save this file as phase2_brute_force_embedded.py
+
+Requires: pycryptodome (pip install pycryptodome)
+
+The blob is embedded as a base64 string for easy portability.
+
+Once it finds the correct permutation, it prints the password and full decrypted output.
+
+
+
