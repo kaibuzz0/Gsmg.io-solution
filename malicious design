@@ -1,0 +1,40 @@
+## ⚖️ Challenge vs. Cheating — What’s Legit and What Crossed the Line
+
+Not all difficulty is deception. Some challenges are fair, intentional, and well-designed. But others are **maliciously obfuscated** — designed to appear solvable while actively preventing success.
+
+Below is a breakdown of what parts of the GSMG puzzle represented **valid challenge**, and what parts crossed into **bad faith manipulation**.
+
+---
+
+| **Puzzle Element** | **Legitimate Challenge?** | **Malicious Obfuscation?** | **Reason** |
+|---------------------|----------------------------|------------------------------|------------|
+| AES-CBC Encryption  | ✅ Yes                     | ❌ No                        | Industry-standard encryption — appropriate for puzzle structure |
+| Salted passphrase use | ✅ Yes                  | ❌ No                        | Expected in OpenSSL-style blobs |
+| Hidden password in spectrogram audio | ✅ Yes | ❌ No                      | Creative multimedia clue — difficult but solvable |
+| Use of PBKDF1 in Phase 2/3 | ✅ Yes           | ❌ No                        | Old but valid KDF choice — acceptable if consistent |
+| Silent switch to PBKDF2 in Phase 4 | ❌ No      | ✅ Yes                       | No clue or rationale for changing the encryption model mid-puzzle |
+| Passphrase constructed from abstract symbolic chains | ✅ Yes | ❌ No       | High-difficulty but thematically consistent |
+| Lack of delimiter in password structure | ✅ Yes | ❌ No                      | Intentionally hard, but still logical given the format |
+| Missing audio file (SDK6 redirection) | ❌ No    | ✅ Yes                       | Required file was missing from intended clue location — solve became impossible without luck |
+| Public "SovereignKey" for Satoshi's Genesis Wallet | ❌ No | ✅ Yes            | Known unspendable address — proves reward was a decoy |
+| No verification, leaderboard, or contact method | ❌ No | ✅ Yes                   | Zero way to confirm progress or success — undermines entire premise of the challenge |
+
+---
+
+### 🧩 Summary
+
+GSMG presented a **brilliant encryption puzzle** — layered, symbolic, and multi-domain.  
+But it was also sabotaged by:
+
+- Missing essential files  
+- Shifting encryption logic without warning  
+- A known fake BTC wallet  
+- Complete lack of response from the PuzzleMaker
+
+These choices didn’t make the puzzle *harder*.  
+They made it **unsolvable by design** — until someone like me found *another way through*.
+
+> 🛡️ Difficulty is fair.  
+> ❌ Deception is not.  
+>  
+> This wasn’t just a hard puzzle. It was a **trap disguised as a test**.
