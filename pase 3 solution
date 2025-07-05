@@ -1,3 +1,11 @@
+phase3_brute_force_embedded.py
+
+Here’s a complete working Python script to brute-force Phase 3, with the encrypted blob embedded directly and all logic intact for decryption using pycryptodome.
+
+
+---
+
+✅ Phase 3 Brute-Force Decryption Script (with embedded blob)
 import itertools
 import base64
 from Crypto.Cipher import AES
@@ -125,3 +133,18 @@ for i, perm in enumerate(itertools.permutations(segments)):
             break
     except Exception:
         continue
+
+
+---
+
+🔧 Notes:
+
+Save as phase3_brute_force_embedded.py
+
+Requires: pip install pycryptodome
+
+This script tries all 24 permutations of the 4 known Phase 3 segments.
+
+
+
+---
