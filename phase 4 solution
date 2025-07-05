@@ -1,0 +1,46 @@
+import base64
+import itertools
+from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Hash import SHA256
+
+# Base64-encoded Phase 4 blob (replace with full blob if needed)
+encrypted_blob_base64 = """
+5f53fdbf45eab1d07728636dc3db88c21135ceb43a5fda599293657cb7b575a11b7a184fb2c0eab76dd45711d1e3b5be68a8a17d39a646a38a93d7ac61655ac9836154a31bbec43b06cc3aaab39e8ae0795efc6115cb3db0cd31084e06f5cf5af585ba42055bb92921bd9e35a4378f508f853d73ed4069d8eeea38e51adb0e44625db94e9b0e540fd1ae2d6622dc8ba1a774d6696ba1bbc019bbb6cce70e85bc1e81ddf649949e6fba0e63e47377b69a4b819fd98ca339cc5aca61c24ab304d6f40bd7cd222e38d5183178fcdfcfa6802ebeeb05ea586938f96df31db43fa62f073119e0ee35120107bf67336885bdb66a57a382bcd0aaf590097834d2b0e327fc1cbb09e0e4595a402904fd70c0723dc1bd5916324a4fe24b5f1348baec547b85c2eb936f4fa0e2ee9a88b23e4288100e9de3ff144e6e909492115b1f6f97c42dedd2c7dfb870ad69627525c0b189c9f35d876a4769e6e4169064191411f1e9b89e90244b9a6a6f4073862eeff3c37cf096497afdeca4a1f37a02aaae4f6e51210a0f77c81cb0e18decd3aa4f673f7d74384ed2bda8f75c3576f00773cde7b89403d5049f03855fb105e4036eca790ba45078da1d3fa1822dece7dd01cde9d27ee5ac7835797268a14e8bbcf908e9e23c2bdd3ff4794659ff5e17a68e178db436f0b35ae6e13985fbe77961a5919d2731b88920c5e56e6cdf32735a4753ebe83a36be503ba0334f56ac2a020e5878bf60b12b4010094a1b4075b411c5acfef946b96b5567ab511021a70a2746ba4936d51f29ea5f297f2f53471da24be6ba645dfc886565ca38f42df170358fbde3a2c98c72416f93b4a6ca5e38c208f0e6cfa8e1224d638490fc7642549bb0b650dc4bbc37aba5259b6af1d8315878d29fe7127877294d09c19fbcb3cb21e9df80521fe5265d91568bc1be937e2537c4bdfd4974be6d50600469f343732c93ebeac204383e7db6318be2d12f739c3279d285
+"""
+
+# Decode and extract salt and ciphertext
+encrypted_data = base64.b64decode(encrypted_blob_base64)
+assert encrypted_data[:8] == b"Salted__"
+salt = encrypted_data[8:16]
+ciphertext = encrypted_data[16:]
+
+# Segments for Phase 4 (can be reordered)
+segments = [
+    "TheSeedIsPlanted",
+    "ChoiceIsAnIllusion",
+    "MatrixSumList",
+    "LastWordsBeforeArchiChoice",
+    "JacqueFractal",
+    "ThereIsNoSpoon",
+    "FFGPFGGQG3GNpjk6"
+]
+
+# Try all permutations
+for i, perm in enumerate(itertools.permutations(segments)):
+    password = ''.join(perm)
+    key_iv = PBKDF2(password.encode(), salt, dkLen=32+16, count=1000, hmac_hash_module=SHA256)
+    key = key_iv[:32]
+    iv = key_iv[32:]
+
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    try:
+        decrypted = cipher.decrypt(ciphertext)
+        if b"::==DATA_BLOCK_START==::" in decrypted:
+            print(f"\n✅ Match found! Permutation #{i+1}: {password}\n")
+            print(decrypted.decode(errors="replace"))
+            break
+    except Exception:
+        continue
+else:
+    print("❌ No valid decryption found.")
